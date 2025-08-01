@@ -1,0 +1,142 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TK Payment Tracker</title>
+    <meta name="theme-color" content="#007bff"/>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="stylesheet" href="style.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "html2canvas": "https://cdn.skypack.dev/html2canvas",
+        "firebase/app": "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js"
+      }
+    }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="menu-container">
+            <button id="install-button" class="btn btn-icon hidden" title="Install App">&#11015;</button>
+            <button id="save-button" class="btn btn-icon" title="Save Current State">&#128190;</button>
+            <button id="menu-button" class="btn btn-icon" title="Menu">&#8942;</button>
+            <div id="menu-dropdown" class="menu-dropdown hidden">
+                <button id="add-recipient-btn" class="menu-item">Add New Recipient</button>
+                <button id="history-btn" class="menu-item">History</button>
+                <button id="clear-all-btn" class="menu-item">Clear All Data</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>TK Payment Tracker</h1>
+            <p>Track daily payments, group them, and download receipts.</p>
+        </header>
+        <main>
+            <form id="payment-form" class="card">
+                <div class="form-group">
+                    <label for="recipient-name">Recipient:</label>
+                    <select id="recipient-name" required>
+                        <option value="" disabled selected>Select a name</option>
+                        <!-- Options will be dynamically populated by JavaScript -->
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="amount">Amount (TK):</label>
+                    <input type="number" id="amount" placeholder="e.g., 50" required min="0.01" step="0.01">
+                </div>
+                <button type="submit" class="btn btn-primary">Add Payment</button>
+            </form>
+
+            <section class="transactions-section card">
+                <h2 id="transactions-heading">Current Transactions</h2>
+                <div id="transactions-list">
+                    <!-- Transactions will be dynamically added here -->
+                </div>
+                <div class="total-container">
+                    <strong>Total:</strong>
+                    <span id="total-amount">0.00 TK</span>
+                </div>
+                
+            </section>
+
+            <section id="grouped-results-section" class="hidden">
+                 <h2>Saved Groups</h2>
+                 <div id="grouped-results">
+                     <!-- Grouped results will be dynamically added here -->
+                 </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Recipient Modal -->
+    <div id="add-recipient-modal" class="modal hidden">
+        <div class="modal-content card">
+            <span class="close-button" title="Close">&times;</span>
+            <h2>Add New Recipient</h2>
+            <form id="add-recipient-form" class="modal-form">
+                <div class="form-group">
+                    <label for="new-recipient-name">Recipient Name:</label>
+                    <input type="text" id="new-recipient-name" placeholder="Enter name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Save Name</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- History Modal -->
+    <div id="history-modal" class="modal hidden">
+        <div class="modal-content card">
+            <span class="close-button" title="Close">&times;</span>
+            <h2>Saved History</h2>
+            <div id="history-list">
+                <!-- History items will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden invoice template for html2canvas -->
+    <div id="invoice-container" style="position: absolute; left: -9999px; top: -9999px; width: 500px; padding: 20px; background: white;">
+        <div id="invoice-template" class="invoice-box">
+             <h2 class="invoice-header">PAYMENT RECEIPT</h2>
+             <p><strong>To:</strong> <span id="invoice-name"></span></p>
+             <p><strong>Date:</strong> <span id="invoice-date"></span></p>
+             <table class="invoice-table">
+                 <thead>
+                     <tr>
+                         <th>S.No.</th>
+                         <th>Amount (TK)</th>
+                     </tr>
+                 </thead>
+                 <tbody id="invoice-table-body">
+                 </tbody>
+             </table>
+             <div class="invoice-totals">
+                <!-- This block shows by default -->
+                <p id="invoice-simple-total-container"><strong>Total:</strong> <span id="invoice-total"></span></p>
+                
+                <!-- This block shows only when a SAR rate is entered -->
+                <div id="invoice-detailed-total-container" style="display: none;">
+                    <p><strong>SAR Rate:</strong> <span id="invoice-detail-rate"></span></p>
+                    <p><strong>Total TK:</strong> <span id="invoice-detail-total-tk"></span></p>
+                    <hr style="margin: 5px 0;">
+                    <p><strong>Subtotal SAR:</strong> <span id="invoice-subtotal-sar"></span></p>
+                    <div id="invoice-old-balance-section" style="display: none;">
+                        <p><strong>Old SAR Balance:</strong> <span id="invoice-detail-old-balance"></span></p>
+                    </div>
+                     <div id="invoice-joma-section" style="display: none;">
+                        <p><strong>Joma SAR:</strong> <span id="invoice-detail-joma"></span></p>
+                    </div>
+                    <hr style="margin: 5px 0; border-style: dashed;">
+                    <p style="font-size: 1.3em;"><strong id="invoice-due-label">Due SAR:</strong> <span id="invoice-detail-balance-sar"></span></p>
+                </div>
+             </div>
+             <p class="invoice-footer">Thank you for your service!</p>
+        </div>
+    </div>
+
+    <script src="script.js" type="module"></script>
+</body>
+</html>
